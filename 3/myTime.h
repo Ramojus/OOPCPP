@@ -1,5 +1,5 @@
-//#ifndef __TIME_H
-//#define __TIME_H
+#ifndef __TIME_H
+#define __TIME_H
 
 #include <iostream>
 #include <sstream>
@@ -34,4 +34,4 @@ namespace My {
     };
 };
 
-//#endif // __TIME_H
+#endif // __TIME_H
