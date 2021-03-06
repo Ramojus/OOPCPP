@@ -20,11 +20,11 @@ namespace My {
     Time::~Time() {
     }
 
-    void Time::setMinutesPerHour(int minutesPerHour) {
+    void Time::setMinutesPerHour(unsigned int minutesPerHour) {
         Time::minutesPerHour = minutesPerHour;
     }
 
-    void Time::setSecondsPerMinute(int secondsPerMinute) {
+    void Time::setSecondsPerMinute(unsigned int secondsPerMinute) {
         Time::secondsPerMinute = secondsPerMinute;
     }
 
@@ -82,9 +82,9 @@ namespace My {
         sstream << getMin2digits(this->hours) << ':'
             << getMin2digits(this->minutes) << ':'
             << getMin2digits(this->seconds) << '\n'
-            << "ID: " <<  this->ID << '\n'
+            << "ID: " << this->ID << '\n'
             << "minutesPerHour: " << this->minutesPerHour << '\n'
-            << "secondsPerMinute: " <<  this->secondsPerMinute << '\n';
+            << "secondsPerMinute: " << this->secondsPerMinute << '\n';
         return sstream.str();
     }
 

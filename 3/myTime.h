@@ -19,8 +19,8 @@ namespace My {
             Time();
             Time(int hours, int minutes, int seconds);
             ~Time();
-            static void setMinutesPerHour(int minutesPerHour);
-            static void setSecondsPerMinute(int secondsPerMinute);
+            static void setMinutesPerHour(unsigned int minutesPerHour);
+            static void setSecondsPerMinute(unsigned int secondsPerMinute);
             int getHours();
             int getMinutes();
             int getSeconds();
