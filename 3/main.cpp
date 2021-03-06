@@ -17,9 +17,12 @@ int main () {
         cout << time.toString() << endl;
 
         Time::setMinutesPerHour(400);
+        Time::setSecondsPerMinute(400);
         Time time2(2, 400, 183);
         time2.add(time);
         cout << time2.toString() << endl;
+        cout << "Hours: " << time2.getHours() << "\nMinutes: " << time2.getMinutes()
+            << "\nSeconds: " << time2.getSeconds() << "\nID: " << time2.getID() << endl;
     }
     catch (exception &exception) {
         cout << "Error: " << exception.what() << endl;
