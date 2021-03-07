@@ -79,23 +79,29 @@ namespace My {
 
     std::string Time::toString() {
         std::stringstream sstream;
-        sstream << getMin2digits(this->hours) << ':'
-            << getMin2digits(this->minutes) << ':'
-            << getMin2digits(this->seconds) << '\n'
+        int digitsCount = getNrOfDigits(std::max(minutesPerHour, secondsPerMinute));
+        sstream << getCountDigits(digitsCount, this->hours) << ':'
+            << getCountDigits(digitsCount, this->minutes) << ':'
+            << getCountDigits(digitsCount, this->seconds) << '\n'
             << "ID: " << this->ID << '\n'
             << "minutesPerHour: " << this->minutesPerHour << '\n'
             << "secondsPerMinute: " << this->secondsPerMinute << '\n';
         return sstream.str();
     }
 
-    std::string Time::getMin2digits(int value) {
+    int Time::getNrOfDigits(int value) {
+        return std::to_string(value).length();
+    }
+
+    std::string Time::getCountDigits(int count, int value) {
         std::stringstream sstream;
-        if (value < 10) {
-            if (value < 0) {
-                sstream << '-';
-                value = -value;
-            }
+        if (value < 0) {
+            sstream << '-';
+            value = -value;
+        }
+        while (getNrOfDigits(value) < count) {
             sstream << 0;
+            --count;
         }
         sstream << value;
         return sstream.str();

@@ -30,7 +30,8 @@ namespace My {
             void fixFormat();
             std::string toString();
         private:
-            std::string getMin2digits(int value);
+            int getNrOfDigits(int value);
+            std::string getCountDigits(int count, int value);
     };
 };
 
