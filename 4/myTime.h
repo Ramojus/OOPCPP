@@ -12,24 +12,25 @@ namespace My {
             int seconds;
             static const unsigned int MINUTES_PER_HOUR;
             static const unsigned int SECONDS_PER_MINUTE;
+            static const char seperator;
             static unsigned int instanceCount;
-            const int ID;
+            int ID;
 
         public:
             Time();
             Time(int hours, int minutes, int seconds);
             ~Time();
-            static void setMinutesPerHour(unsigned int minutesPerHour);
-            static void setSecondsPerMinute(unsigned int secondsPerMinute);
             int getHours();
             int getMinutes();
             int getSeconds();
-            std::string getTime();
+            std::string getTime() const;
             int getID();
             void add(Time time);
             void subtract(Time time);
             void fixFormat();
             std::string toString();
+            friend std::ostream& operator<<(std::ostream &outputStream, const Time &time);
+            friend std::istream& operator>>(std::istream &inputStream, Time &time);
             bool operator==(const Time &time) const;
             bool operator!=(const Time &time) const;
             bool operator>(const Time &time) const;

@@ -11,10 +11,13 @@ int main () {
     try {
         cout << "\nCreating first object" << endl;
         Time time(-1, 20, 20);
-        cout << "To string output: "
-             << time.toString() << endl;
-        cout << "Get time output: "
-             << time.getTime() << endl;
+        cout << "To string output: " << time.toString() << endl;
+        cout << "Get time output: " << time.getTime() << endl;
+        cout << "output stream test: " << time << endl;
+        cout << "Enter time: ";
+        Time testTime;
+        cin >> testTime;
+        cout << testTime;
 
         cout << "\nChecking addition/subtraction operatorations" << endl;
         time.subtract(Time(0, 60, 0));

@@ -2,7 +2,7 @@
 #include <sstream>
 #include "myTime.h"
 
-std::string getCountDigits(int count, int value);
+std::string getCountPositiveDigits(int count, int value);
 
 namespace My {
 
@@ -39,14 +39,14 @@ namespace My {
         return this->seconds;
     }
     
-    std::string Time::getTime() {
+    std::string Time::getTime() const {
         std::ostringstream ouptutStringStream;
         if (this->hours < 0 || this->minutes < 0 || this->seconds < 0)
             ouptutStringStream << '-';
         int digitsCount = std::to_string(std::max(MINUTES_PER_HOUR, SECONDS_PER_MINUTE)).length();
-        ouptutStringStream << getCountDigits(digitsCount, this->hours) << ':'
-            << getCountDigits(digitsCount, this->minutes) << ':'
-            << getCountDigits(digitsCount, this->seconds);
+        ouptutStringStream << getCountPositiveDigits(digitsCount, this->hours) << ':'
+            << getCountPositiveDigits(digitsCount, this->minutes) << ':'
+            << getCountPositiveDigits(digitsCount, this->seconds);
 
         return ouptutStringStream.str();
     }
@@ -89,11 +89,11 @@ namespace My {
 
         if (this->hours < 0 && this->minutes > 0) {
             ++this->hours;
-            this->minutes -= 60;
+            this->minutes -= MINUTES_PER_HOUR;
         }
         if (this->minutes < 0 && this->seconds > 0) {
             ++this->minutes;
-            this->seconds -= 60;
+            this->seconds -= SECONDS_PER_MINUTE;
         }
     }
 
@@ -102,6 +102,23 @@ namespace My {
         sstream << "H: " << this->hours << ", M: " << this->minutes << ", S: " << this->seconds
             << ", ID: " << this->ID;
         return sstream.str();
+    }
+
+    std::ostream& operator<<(std::ostream &outputStream, const Time &time) {
+        outputStream << time.getTime();
+        return outputStream;
+    }
+
+    std::istream& operator>>(std::istream &inputStream, Time &time) {
+        char sep1, sep2;
+        Time tmp;
+        inputStream >> tmp.hours >> sep1 >> tmp.minutes >> sep2 >> tmp.seconds;
+        if (sep1 != Time::seperator || sep2 != Time::seperator) {
+            throw std::ios_base::failure("Wrong input");
+        }
+        tmp.fixFormat();
+        time = tmp;
+        return inputStream;
     }
 
     bool Time::operator==(const Time &time) const {
@@ -173,9 +190,10 @@ namespace My {
     unsigned int Time::instanceCount = 0;
     const unsigned int Time::MINUTES_PER_HOUR = 60;
     const unsigned int Time::SECONDS_PER_MINUTE = 60;
+    const char Time::seperator = ':';
 }
 
-std::string getCountDigits(int count, int value) {
+std::string getCountPositiveDigits(int count, int value) {
     std::stringstream sstream;
     while (std::to_string(value).length() < count) {
         sstream << 0;
