@@ -2,9 +2,15 @@
 #include <sstream>
 #include "myTime.h"
 
-std::string getCountPositiveDigits(int count, int value);
+namespace Error {
+    namespace Time {
+        const std::string wrongInputFormat = "Wrong input format. Should be 'H:M:S'";
+    }
+}
 
 namespace My {
+    std::string getCountPositiveDigits(int count, int value);
+    int readUnit(std::string input, int &index, char seperator);
 
     Time::Time() : ID(instanceCount) {
         hours = 0;
@@ -17,25 +23,33 @@ namespace My {
         this->hours = hours;
         this->minutes = minutes;
         this->seconds = seconds;
-        fixFormat();
+        this->fixFormat();
     }
 
     Time::~Time() {
+    }
+
+    void Time::setHours(int hours) {
+        this->hours = hours;
     }
 
     int Time::getHours() {
         return this->hours;
     }
 
+    void Time::setMinutes(int minutes) {
+        this->minutes = minutes;
+    }
+
     int Time::getMinutes() {
-        if (this->hours < 0 && this->minutes > 0)
-            return -this->minutes;
         return this->minutes;
     }
 
+    void Time::setSeconds(int seconds) {
+        this->seconds = seconds;
+    }
+
     int Time::getSeconds() {
-        if ((this->hours < 0 || this->minutes < 0) && this->seconds > 0)
-            return -this->seconds;
         return this->seconds;
     }
     
@@ -59,14 +73,14 @@ namespace My {
         this->hours += time.hours;
         this->minutes += time.minutes;
         this->seconds += time.seconds;
-        fixFormat();
+        this->fixFormat();
     }
 
     void Time::subtract(Time time) {
         this->hours -= time.hours;
         this->minutes -= time.minutes;
         this->seconds -= time.seconds;
-        fixFormat();
+        this->fixFormat();
     }
 
     void Time::fixFormat() {
@@ -112,9 +126,24 @@ namespace My {
     std::istream& operator>>(std::istream &inputStream, Time &time) {
         char sep1, sep2;
         Time tmp;
-        inputStream >> tmp.hours >> sep1 >> tmp.minutes >> sep2 >> tmp.seconds;
-        if (sep1 != Time::seperator || sep2 != Time::seperator) {
-            throw std::ios_base::failure("Wrong input");
+        std::string input, currentValue;
+        bool isNegative = 0;
+
+        getline(inputStream, input);
+        if (input[0] == '-')
+            isNegative = 1;
+
+        int i = isNegative;
+        tmp.hours = readUnit(input, i, Time::seperator);
+        ++i;
+        tmp.minutes = readUnit(input, i, Time::seperator);
+        ++i;
+        tmp.seconds = readUnit(input, i, Time::seperator);
+
+        if (isNegative) {
+            tmp.hours = -tmp.hours;
+            tmp.minutes = -tmp.minutes;
+            tmp.seconds = -tmp.seconds;
         }
         tmp.fixFormat();
         time = tmp;
@@ -134,7 +163,6 @@ namespace My {
     }
 
     bool Time::operator>(const Time &time) const {
-
         if (this->hours > time.hours)
             return 1;
         if (this->hours == time.hours) {
@@ -163,27 +191,27 @@ namespace My {
 
     Time &Time::operator++() {
         ++this->minutes;
-        fixFormat();
+        this->fixFormat();
         return *this;
     }
 
     Time Time::operator++(int) {
         Time copy = *this;
         ++this->minutes;
-        fixFormat();
+        this->fixFormat();
         return copy;
     }
 
     Time &Time::operator--() {
         --this->minutes;
-        fixFormat();
+        this->fixFormat();
         return *this;
     }
 
     Time Time::operator--(int) {
         Time copy = *this;
         --this->minutes;
-        fixFormat();
+        this->fixFormat();
         return copy;
     }
 
@@ -191,15 +219,31 @@ namespace My {
     const unsigned int Time::MINUTES_PER_HOUR = 60;
     const unsigned int Time::SECONDS_PER_MINUTE = 60;
     const char Time::seperator = ':';
+
+    std::string getCountPositiveDigits(int count, int value) {
+        std::stringstream sstream;
+        int positiveValue = abs(value);
+        int nrOfDigits = std::to_string(positiveValue).length();
+        while (nrOfDigits < count) {
+            sstream << 0;
+            --count;
+        }
+        sstream << positiveValue;
+        return sstream.str();
+    }
+
+    int readUnit(std::string input, int &index, char seperator) {
+        std::string currentValue;
+        while (isdigit(input[index])) {
+            currentValue += input[index];
+            ++index;
+        }
+        if (input[index] == seperator || index == input.size()) {
+            return std::stoi(currentValue);
+        }
+        throw std::ios_base::failure(Error::Time::wrongInputFormat);
+    }
+
 }
 
-std::string getCountPositiveDigits(int count, int value) {
-    std::stringstream sstream;
-    while (std::to_string(value).length() < count) {
-        sstream << 0;
-        --count;
-    }
-    sstream << (value < 0? -value: value);
-    return sstream.str();
-}
 

@@ -20,8 +20,11 @@ namespace My {
             Time();
             Time(int hours, int minutes, int seconds);
             ~Time();
+            void setHours(int hours);
             int getHours();
+            void setMinutes(int minutes);
             int getMinutes();
+            void setSeconds(int seconds);
             int getSeconds();
             std::string getTime() const;
             int getID();
@@ -30,6 +33,7 @@ namespace My {
             void fixFormat();
             std::string toString();
             friend std::ostream& operator<<(std::ostream &outputStream, const Time &time);
+            // reads input in H:M:S format with strong exception safety guarantee
             friend std::istream& operator>>(std::istream &inputStream, Time &time);
             bool operator==(const Time &time) const;
             bool operator!=(const Time &time) const;
@@ -41,6 +45,10 @@ namespace My {
             Time operator++(int);
             Time &operator--();
             Time operator--(int);
+
+        private:
+            int& getUnit(Unit unit);
+
     };
 };
 

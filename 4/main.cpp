@@ -1,6 +1,7 @@
 #include <iostream>
 #include <exception>
 #include <cassert>
+#include <sstream>
 
 #include "myTime.h"
 
@@ -13,11 +14,6 @@ int main () {
         Time time(-1, 20, 20);
         cout << "To string output: " << time.toString() << endl;
         cout << "Get time output: " << time.getTime() << endl;
-        cout << "output stream test: " << time << endl;
-        cout << "Enter time: ";
-        Time testTime;
-        cin >> testTime;
-        cout << testTime;
 
         cout << "\nChecking addition/subtraction operatorations" << endl;
         time.subtract(Time(0, 60, 0));
@@ -25,7 +21,7 @@ int main () {
 
         time.add(Time(3, 40, 40));
         assert(time.getHours() == 2 && time.getMinutes() == 1 && time.getSeconds() == 0);
-        cout << "Addition/subtraction operatorations working." << endl;
+        cout << "Addition/subtraction operatorations working" << endl;
 
         cout << "\nChecking relation operators" << endl;
         assert (Time(40, 30, 10) == Time(40, 30, 10));
@@ -51,25 +47,43 @@ int main () {
         assert(Time(40, 30, 10) <= Time(40, 31, 10));
         assert(Time(40, 30, 10) <= Time(41, 30, 10));
         assert(Time(40, 30, 10) <= Time(40, 30, 10));
-        cout << "All relation operators working." << endl;
+        cout << "All relation operators working" << endl;
 
         cout << "\nChecking post/pre increment and decrement operators" << endl;
-        Time preIncTest(0, 0, 0);
-        assert(++preIncTest == Time(0, 1, 0));
+        time = Time(0, 0, 0);
+        assert(++time == Time(0, 1, 0));
 
-        Time postIncTest(0, 0, 0);
-        assert(postIncTest++ == Time(0, 0, 0));
-        assert(preIncTest.getMinutes() == 1);
+        time = Time(0, 0, 0);
+        assert(time++ == Time(0, 0, 0));
+        assert(time.getMinutes() == 1);
 
-        Time preDecTest(0, 0, 0);
-        assert(--preDecTest == Time(0, -1, 0));
+        time = Time(0, 0, 0);
+        assert(--time == Time(0, -1, 0));
 
-        Time postDecTest(0, 0, 0);
-        assert(postDecTest-- == Time(0, 0, 0));
-        assert(postDecTest.getMinutes() == -1);
-        cout << "Post/pre increment and decrement operators working." << endl;
+        time = Time(0, 0, 0);
+        assert(time-- == Time(0, 0, 0));
+        assert(time.getMinutes() == -1);
+        cout << "Post/pre increment and decrement operators working" << endl;
+
+        cout << "Original: " << time << endl;
+        cout << "\nChecking input/output stream operators" << endl;
+        stringstream testStream;
+        testStream << time;
+        Time streamOutput;
+        testStream >> streamOutput;
+        cout << "Stream output: " << streamOutput << endl;
+        cout << "Original: " << time << endl;
+        assert(time == streamOutput);
+        cout << "Input/output stream operators working" << endl;
+
 
         cout << "\nEverything seems to be working correctly" << endl;
+    }
+    catch (const std::invalid_argument &e) {
+        std::cout << "invalid argument: " << e.what() << endl;
+    }
+    catch (const std::out_of_range &e) {
+        std::cout << "Out of range: " << e.what() << endl;
     }
     catch (exception &exception) {
         cout << "Error: " << exception.what() << endl;
