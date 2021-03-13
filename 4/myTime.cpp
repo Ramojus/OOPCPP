@@ -2,7 +2,10 @@
 #include <sstream>
 #include "myTime.h"
 
+std::string getCountDigits(int count, int value);
+
 namespace My {
+
     Time::Time() : ID(instanceCount) {
         hours = 0;
         minutes = 0;
@@ -20,24 +23,32 @@ namespace My {
     Time::~Time() {
     }
 
-    void Time::setMinutesPerHour(unsigned int minutesPerHour) {
-        Time::minutesPerHour = minutesPerHour;
-    }
-
-    void Time::setSecondsPerMinute(unsigned int secondsPerMinute) {
-        Time::secondsPerMinute = secondsPerMinute;
-    }
-
     int Time::getHours() {
         return this->hours;
     }
 
     int Time::getMinutes() {
+        if (this->hours < 0 && this->minutes > 0)
+            return -this->minutes;
         return this->minutes;
     }
 
     int Time::getSeconds() {
-        return seconds;
+        if ((this->hours < 0 || this->minutes < 0) && this->seconds > 0)
+            return -this->seconds;
+        return this->seconds;
+    }
+    
+    std::string Time::getTime() {
+        std::ostringstream ouptutStringStream;
+        if (this->hours < 0 || this->minutes < 0 || this->seconds < 0)
+            ouptutStringStream << '-';
+        int digitsCount = std::to_string(std::max(MINUTES_PER_HOUR, SECONDS_PER_MINUTE)).length();
+        ouptutStringStream << getCountDigits(digitsCount, this->hours) << ':'
+            << getCountDigits(digitsCount, this->minutes) << ':'
+            << getCountDigits(digitsCount, this->seconds);
+
+        return ouptutStringStream.str();
     }
 
     int Time::getID() {
@@ -59,51 +70,37 @@ namespace My {
     }
 
     void Time::fixFormat() {
-        if (this->seconds > 0) {
-            this->minutes += this->seconds / secondsPerMinute;
-            this->seconds = this->seconds % secondsPerMinute;
+        if (this->seconds >= 0) {
+            this->minutes += this->seconds / SECONDS_PER_MINUTE;
+            this->seconds = this->seconds % SECONDS_PER_MINUTE;
         }
-        else {
-            this->minutes -= (-this->seconds) / secondsPerMinute + 1;
-            this->seconds = secondsPerMinute - (-this->seconds) % secondsPerMinute;
+        else if (this->minutes > 0) {
+            this->minutes -= (-this->seconds) / SECONDS_PER_MINUTE + 1;
+            this->seconds = SECONDS_PER_MINUTE - (-this->seconds) % SECONDS_PER_MINUTE;
         }
-        if (this->minutes > 0) {
-            this->hours += this->minutes / minutesPerHour;
-            this->minutes = this->minutes % minutesPerHour;
+        if (this->minutes >= 0) {
+            this->hours += this->minutes / MINUTES_PER_HOUR;
+            this->minutes = this->minutes % MINUTES_PER_HOUR;
         }
-        else {
-            this->hours -= (-this->minutes) / minutesPerHour + 1;
-            this->minutes = minutesPerHour - (-this->minutes) % minutesPerHour;
+        else if (this->hours > 0) {
+            this->hours -= (-this->minutes) / MINUTES_PER_HOUR + 1;
+            this->minutes = MINUTES_PER_HOUR - (-this->minutes) % MINUTES_PER_HOUR;
+        }
+
+        if (this->hours < 0 && this->minutes > 0) {
+            ++this->hours;
+            this->minutes -= 60;
+        }
+        if (this->minutes < 0 && this->seconds > 0) {
+            ++this->minutes;
+            this->seconds -= 60;
         }
     }
 
     std::string Time::toString() {
         std::stringstream sstream;
-        int digitsCount = getNrOfDigits(std::max(minutesPerHour, secondsPerMinute));
-        sstream << getCountDigits(digitsCount, this->hours) << ':'
-            << getCountDigits(digitsCount, this->minutes) << ':'
-            << getCountDigits(digitsCount, this->seconds) << '\n'
-            << "ID: " << this->ID << '\n'
-            << "minutesPerHour: " << this->minutesPerHour << '\n'
-            << "secondsPerMinute: " << this->secondsPerMinute << '\n';
-        return sstream.str();
-    }
-
-    int Time::getNrOfDigits(int value) {
-        return std::to_string(value).length();
-    }
-
-    std::string Time::getCountDigits(int count, int value) {
-        std::stringstream sstream;
-        if (value < 0) {
-            sstream << '-';
-            value = -value;
-        }
-        while (getNrOfDigits(value) < count) {
-            sstream << 0;
-            --count;
-        }
-        sstream << value;
+        sstream << "H: " << this->hours << ", M: " << this->minutes << ", S: " << this->seconds
+            << ", ID: " << this->ID;
         return sstream.str();
     }
 
@@ -120,6 +117,7 @@ namespace My {
     }
 
     bool Time::operator>(const Time &time) const {
+
         if (this->hours > time.hours)
             return 1;
         if (this->hours == time.hours) {
@@ -146,8 +144,44 @@ namespace My {
         return !(*this > time);
     }
 
+    Time &Time::operator++() {
+        ++this->minutes;
+        fixFormat();
+        return *this;
+    }
+
+    Time Time::operator++(int) {
+        Time copy = *this;
+        ++this->minutes;
+        fixFormat();
+        return copy;
+    }
+
+    Time &Time::operator--() {
+        --this->minutes;
+        fixFormat();
+        return *this;
+    }
+
+    Time Time::operator--(int) {
+        Time copy = *this;
+        --this->minutes;
+        fixFormat();
+        return copy;
+    }
+
     unsigned int Time::instanceCount = 0;
-    unsigned int Time::minutesPerHour = 60;
-    unsigned int Time::secondsPerMinute = 60;
+    const unsigned int Time::MINUTES_PER_HOUR = 60;
+    const unsigned int Time::SECONDS_PER_MINUTE = 60;
+}
+
+std::string getCountDigits(int count, int value) {
+    std::stringstream sstream;
+    while (std::to_string(value).length() < count) {
+        sstream << 0;
+        --count;
+    }
+    sstream << (value < 0? -value: value);
+    return sstream.str();
 }
 
