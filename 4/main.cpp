@@ -68,14 +68,11 @@ int main () {
         cout << "Original: " << time << endl;
         cout << "\nChecking input/output stream operators" << endl;
         stringstream testStream;
-        testStream << time;
         Time streamOutput;
+        testStream << time;
         testStream >> streamOutput;
-        cout << "Stream output: " << streamOutput << endl;
-        cout << "Original: " << time << endl;
         assert(time == streamOutput);
         cout << "Input/output stream operators working" << endl;
-
 
         cout << "\nEverything seems to be working correctly" << endl;
     }

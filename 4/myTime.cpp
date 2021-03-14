@@ -29,27 +29,15 @@ namespace My {
     Time::~Time() {
     }
 
-    void Time::setHours(int hours) {
-        this->hours = hours;
-    }
-
-    int Time::getHours() {
+    int Time::getHours() const {
         return this->hours;
     }
 
-    void Time::setMinutes(int minutes) {
-        this->minutes = minutes;
-    }
-
-    int Time::getMinutes() {
+    int Time::getMinutes() const {
         return this->minutes;
     }
 
-    void Time::setSeconds(int seconds) {
-        this->seconds = seconds;
-    }
-
-    int Time::getSeconds() {
+    int Time::getSeconds() const {
         return this->seconds;
     }
     
@@ -65,18 +53,18 @@ namespace My {
         return ouptutStringStream.str();
     }
 
-    int Time::getID() {
+    int Time::getID() const {
         return this->ID;
     }
 
-    void Time::add(Time time) {
+    void Time::add(const Time &time) {
         this->hours += time.hours;
         this->minutes += time.minutes;
         this->seconds += time.seconds;
         this->fixFormat();
     }
 
-    void Time::subtract(Time time) {
+    void Time::subtract(const Time &time) {
         this->hours -= time.hours;
         this->minutes -= time.minutes;
         this->seconds -= time.seconds;
@@ -111,7 +99,7 @@ namespace My {
         }
     }
 
-    std::string Time::toString() {
+    std::string Time::toString() const {
         std::stringstream sstream;
         sstream << "H: " << this->hours << ", M: " << this->minutes << ", S: " << this->seconds
             << ", ID: " << this->ID;
@@ -189,7 +177,7 @@ namespace My {
         return !(*this > time);
     }
 
-    Time &Time::operator++() {
+    Time Time::operator++() {
         ++this->minutes;
         this->fixFormat();
         return *this;
@@ -202,7 +190,7 @@ namespace My {
         return copy;
     }
 
-    Time &Time::operator--() {
+    Time Time::operator--() {
         --this->minutes;
         this->fixFormat();
         return *this;
