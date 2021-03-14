@@ -34,10 +34,10 @@ namespace My {
             friend std::istream& operator>>(std::istream &inputStream, Time &time);
             bool operator==(const Time &time) const;
             bool operator!=(const Time &time) const;
-            bool operator>(const Time &time) const;
-            bool operator>=(const Time &time) const;
             bool operator<(const Time &time) const;
             bool operator<=(const Time &time) const;
+            bool operator>(const Time &time) const;
+            bool operator>=(const Time &time) const;
             // adds one minute
             Time operator++();
             Time operator++(int);

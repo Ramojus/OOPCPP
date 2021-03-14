@@ -16,11 +16,13 @@ int main () {
         cout << "Get time output: " << time.getTime() << endl;
 
         cout << "\nChecking addition/subtraction operatorations" << endl;
-        time.subtract(Time(0, 60, 0));
-        assert(time.getHours() == -1 && time.getMinutes() == -39 && time.getSeconds() == -40);
+        time = Time();
+        time.subtract(Time(0, 64, 0));
+        assert(time.getHours() == -1 && time.getMinutes() == -4 && time.getSeconds() == 0);
 
+        time = Time(-1, -20, -20);
         time.add(Time(3, 40, 40));
-        assert(time.getHours() == 2 && time.getMinutes() == 1 && time.getSeconds() == 0);
+        assert(time.getHours() == 2 && time.getMinutes() == 20 && time.getSeconds() == 20);
         cout << "Addition/subtraction operatorations working" << endl;
 
         cout << "\nChecking relation operators" << endl;
@@ -65,7 +67,6 @@ int main () {
         assert(time.getMinutes() == -1);
         cout << "Post/pre increment and decrement operators working" << endl;
 
-        cout << "Original: " << time << endl;
         cout << "\nChecking input/output stream operators" << endl;
         stringstream testStream;
         Time streamOutput;

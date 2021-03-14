@@ -150,31 +150,29 @@ namespace My {
         return !(*this == time);
     }
 
-    bool Time::operator>(const Time &time) const {
-        if (this->hours > time.hours)
+    bool Time::operator<(const Time &time) const {
+        if (this->hours < time.hours)
             return 1;
         if (this->hours == time.hours) {
-            if (this->minutes > time.minutes)
+            if (this->minutes < time.minutes)
                 return 1;
             if (this->minutes == time.minutes
-                    && this->seconds > time.seconds)
+                    && this->seconds < time.seconds)
                 return 1;
         }
         return 0;
     }
-
-    bool Time::operator>=(const Time &time) const {
-        if (*this == time || *this > time)
-            return 1;
-        return 0;
-    }
-
-    bool Time::operator<(const Time &time) const {
-        return !(*this >= time);
-    }
     
     bool Time::operator<=(const Time &time) const {
-        return !(*this > time);
+        return (*this < time || *this == time);
+    }
+
+    bool Time::operator>(const Time &time) const {
+        return !(*this < time);
+    }
+
+    bool Time::operator>=(const Time &time) const {
+        return !(*this < time);
     }
 
     Time Time::operator++() {
