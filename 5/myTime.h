@@ -34,7 +34,6 @@ namespace My {
             std::string toString() const;
 
             friend std::ostream& operator<<(std::ostream &outputStream, const Time &time);
-            // reads input in H:M:S format with strong exception safety guarantee
             friend std::istream& operator>>(std::istream &inputStream, Time &time);
 
             bool operator==(const Time &time) const;
@@ -55,7 +54,7 @@ namespace My {
             // operates on minutes
             Time operator--(int);
             
-            friend class Private;
+            friend Private;
     };
 };
 

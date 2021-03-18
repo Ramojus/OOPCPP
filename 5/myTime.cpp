@@ -12,54 +12,68 @@ namespace Error {
 
 namespace My {
     class Time::Private {
-        int hours;
-        int minutes;
-        int seconds;
-        int ID;
-        static const unsigned int MINUTES_PER_HOUR;
-        static const unsigned int SECONDS_PER_MINUTE;
-        static const char SEPERATOR;
-        static unsigned int instanceCount;
+        private:
+            int hours;
+            int minutes;
+            int seconds;
+            int ID;
+            static const unsigned int MINUTES_PER_HOUR;
+            static const unsigned int SECONDS_PER_MINUTE;
+            static const char SEPARATOR;
+            static unsigned int instanceCount;
 
-        Private(int hours, int minutes, int seconds) : ID(instanceCount) {
-            ++this->instanceCount;
-            this->hours = hours;
-            this->minutes = minutes;
-            this->seconds = seconds;
-            this->fixFormat();
-        }
-
-        void fixFormat() {
-            if (this->seconds >= 0) {
-                this->minutes += this->seconds / SECONDS_PER_MINUTE;
-                this->seconds = this->seconds % SECONDS_PER_MINUTE;
-            }
-            else if (this->minutes > 0) {
-                this->minutes -= (-this->seconds) / SECONDS_PER_MINUTE + 1;
-                this->seconds = SECONDS_PER_MINUTE - (-this->seconds) % SECONDS_PER_MINUTE;
-            }
-            if (this->minutes >= 0) {
-                this->hours += this->minutes / MINUTES_PER_HOUR;
-                this->minutes = this->minutes % MINUTES_PER_HOUR;
-            }
-            else if (this->hours > 0) {
-                this->hours -= (-this->minutes) / MINUTES_PER_HOUR + 1;
-                this->minutes = MINUTES_PER_HOUR - (-this->minutes) % MINUTES_PER_HOUR;
-            }
-
-            if (this->hours < 0 && this->minutes > 0) {
-                ++this->hours;
-                this->minutes -= MINUTES_PER_HOUR;
-            }
-            if (this->minutes < 0 && this->seconds > 0) {
-                ++this->minutes;
-                this->seconds -= SECONDS_PER_MINUTE;
-            }
-        }
+        public:
+            Private(int hours, int minutes, int seconds);
+            ~Private();
+            void fixFormat();
 
         friend istream& operator>>(istream &inputStream, Time &time);
-        friend class Time;
+        friend Time;
     };
+
+    unsigned int Time::Private::instanceCount = 0;
+    const unsigned int Time::Private::MINUTES_PER_HOUR = 60;
+    const unsigned int Time::Private::SECONDS_PER_MINUTE = 60;
+    const char Time::Private::SEPARATOR = ':';
+
+    Time::Private::Private(int hours, int minutes, int seconds) : ID(instanceCount) {
+        ++this->instanceCount;
+        this->hours = hours;
+        this->minutes = minutes;
+        this->seconds = seconds;
+        this->fixFormat();
+    }
+
+    Time::Private::~Private() {
+    }
+
+    void Time::Private::fixFormat() {
+        if (this->seconds >= 0) {
+            this->minutes += this->seconds / SECONDS_PER_MINUTE;
+            this->seconds = this->seconds % SECONDS_PER_MINUTE;
+        }
+        else if (this->minutes > 0) {
+            this->minutes -= (-this->seconds) / SECONDS_PER_MINUTE + 1;
+            this->seconds = SECONDS_PER_MINUTE - (-this->seconds) % SECONDS_PER_MINUTE;
+        }
+        if (this->minutes >= 0) {
+            this->hours += this->minutes / MINUTES_PER_HOUR;
+            this->minutes = this->minutes % MINUTES_PER_HOUR;
+        }
+        else if (this->hours > 0) {
+            this->hours -= (-this->minutes) / MINUTES_PER_HOUR + 1;
+            this->minutes = MINUTES_PER_HOUR - (-this->minutes) % MINUTES_PER_HOUR;
+        }
+
+        if (this->hours < 0 && this->minutes > 0) {
+            ++this->hours;
+            this->minutes -= MINUTES_PER_HOUR;
+        }
+        if (this->minutes < 0 && this->seconds > 0) {
+            ++this->minutes;
+            this->seconds -= SECONDS_PER_MINUTE;
+        }
+    }
 
     string getCountPositiveDigits(int count, int value);
     int readUnit(string input, int &index, char seperator);
@@ -93,7 +107,7 @@ namespace My {
     }
 
     void Time::validate(string file, int line) const {
-        if (this->p == nullptr)
+        if (this->p == NULL)
             throw CustomException(file, line, CustomException::UNINITIALIZED_OBJECT);
     }
 
@@ -111,7 +125,7 @@ namespace My {
         this->validate(__FILE__, __LINE__);
         return this->p->seconds;
     }
-    
+
     string Time::getTime() const {
         this->validate(__FILE__, __LINE__);
         ostringstream ouptutStringStream;
@@ -159,6 +173,7 @@ namespace My {
         return outputStream;
     }
 
+    // reads input in (-)H:M:S format with strong exception safety guarantee
     istream& operator>>(istream &inputStream, Time &time) {
         time.validate(__FILE__, __LINE__);
         char sep1, sep2;
@@ -171,11 +186,11 @@ namespace My {
             isNegative = 1;
 
         int i = isNegative;
-        tmp.p->hours = readUnit(input, i, Time::Private::SEPERATOR);
+        tmp.p->hours = readUnit(input, i, Time::Private::SEPARATOR);
         ++i;
-        tmp.p->minutes = readUnit(input, i, Time::Private::SEPERATOR);
+        tmp.p->minutes = readUnit(input, i, Time::Private::SEPARATOR);
         ++i;
-        tmp.p->seconds = readUnit(input, i, Time::Private::SEPERATOR);
+        tmp.p->seconds = readUnit(input, i, Time::Private::SEPARATOR);
 
         if (isNegative) {
             tmp.p->hours = -tmp.p->hours;
@@ -221,7 +236,7 @@ namespace My {
         }
         return 0;
     }
-    
+
     bool Time::operator<=(const Time &time) const {
         return (*this < time || *this == time);
     }
@@ -264,11 +279,6 @@ namespace My {
         return copy;
     }
 
-    unsigned int Time::Private::instanceCount = 0;
-    const unsigned int Time::Private::MINUTES_PER_HOUR = 60;
-    const unsigned int Time::Private::SECONDS_PER_MINUTE = 60;
-    const char Time::Private::SEPERATOR = ':';
-
     string getCountPositiveDigits(int count, int value) {
         stringstream sstream;
         int positiveValue = abs(value);
@@ -294,5 +304,4 @@ namespace My {
     }
 
 }
-
 

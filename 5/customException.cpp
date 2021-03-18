@@ -4,8 +4,8 @@
 
 using namespace std;
 
-const string CustomException::IN_FILE = "file: ";
-const string CustomException::IN_LINE = "line: ";
+#define IN_FILE "file: "
+#define IN_LINE "line: "
 
 const string CustomException::UNINITIALIZED_OBJECT = "Use of uninitialized object";
 const string CustomException::INVALID_INITIALIZATION = "Attempt to initialize initialized object";
