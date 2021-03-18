@@ -3,7 +3,7 @@
 #include <cassert>
 #include <sstream>
 
-#include "myTime.h"
+#include "time.h"
 #include "customException.h"
 
 using namespace std;

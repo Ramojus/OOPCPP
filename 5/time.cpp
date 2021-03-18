@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
-#include "myTime.h"
+#include "time.h"
 #include "customException.h"
 
 using namespace std;
