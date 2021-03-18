@@ -8,14 +8,21 @@ namespace My {
     class Time {
         private:
             class Private;
-            Private *p; 
+            Private *p;
 
         public:
             Time();
             Time(const Time &time);
+            Time(int minutes);
             Time(int hours, int minutes, int seconds);
             ~Time();
+            void init(int minutes);
+            void init(int hours, int minutes, int seconds);
 
+        private:
+            void validate(std::string file, int line) const;
+
+        public:
             int getHours() const;
             int getMinutes() const;
             int getSeconds() const;

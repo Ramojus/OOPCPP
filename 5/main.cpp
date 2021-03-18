@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "myTime.h"
+#include "customException.h"
 
 using namespace std;
 using namespace My;
@@ -16,7 +17,7 @@ int main () {
         cout << "Get time output: " << time.getTime() << endl;
 
         cout << "\nChecking addition/subtraction operatorations" << endl;
-        time = Time();
+        time = Time(0, 0, 0);
         time.subtract(Time(0, 64, 0));
         assert(time.getHours() == -1 && time.getMinutes() == -4 && time.getSeconds() == 0);
 
@@ -69,7 +70,7 @@ int main () {
 
         cout << "\nChecking input/output stream operators" << endl;
         stringstream testStream;
-        Time streamOutput;
+        Time streamOutput = Time(0);
         testStream << time;
         testStream >> streamOutput;
         assert(time == streamOutput);
@@ -77,11 +78,14 @@ int main () {
 
         cout << "\nEverything seems to be working correctly" << endl;
     }
-    catch (const std::invalid_argument &e) {
-        std::cout << "invalid argument: " << e.what() << endl;
+    catch (const CustomException &e) {
+        cout << e.what() << endl;
     }
-    catch (const std::out_of_range &e) {
-        std::cout << "Out of range: " << e.what() << endl;
+    catch (const invalid_argument &e) {
+        cout << "invalid argument: " << e.what() << endl;
+    }
+    catch (const out_of_range &e) {
+        cout << "Out of range: " << e.what() << endl;
     }
     catch (exception &exception) {
         cout << "Error: " << exception.what() << endl;

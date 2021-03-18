@@ -2,11 +2,12 @@
 #include <sstream>
 #include <cstring>
 #include "myTime.h"
+#include "customException.h"
+
+using namespace std;
 
 namespace Error {
-    namespace Time {
-        const std::string wrongInputFormat = "Wrong input format. Should be 'H:M:S'";
-    }
+    const string WRONG_INPUT_FORMAT = "Wrong input format. Should be '(-)H:M:S' e.g. -3:40:20";
 }
 
 namespace My {
@@ -19,12 +20,6 @@ namespace My {
         static const unsigned int SECONDS_PER_MINUTE;
         static const char SEPERATOR;
         static unsigned int instanceCount;
-
-        Private() : ID(instanceCount) {
-            this->hours = 0;
-            this->minutes = 0;
-            this->seconds = 0;
-        }
 
         Private(int hours, int minutes, int seconds) : ID(instanceCount) {
             ++this->instanceCount;
@@ -62,17 +57,20 @@ namespace My {
             }
         }
 
-        friend std::istream& operator>>(std::istream &inputStream, Time &time);
+        friend istream& operator>>(istream &inputStream, Time &time);
         friend class Time;
     };
 
-    std::string getCountPositiveDigits(int count, int value);
-    int readUnit(std::string input, int &index, char seperator);
+    string getCountPositiveDigits(int count, int value);
+    int readUnit(string input, int &index, char seperator);
 
-    Time::Time() : p(new Private()) {
+    Time::Time() : p(NULL) {
     }
 
-    Time::Time(const Time &time) : p(new Private(*time.p)){
+    Time::Time(const Time &time) : p(new Private(*time.p)) {
+    }
+
+    Time::Time(int minutes) : p(new Private(0, minutes, 0)) {
     }
 
     Time::Time(int hours, int minutes, int seconds) : p(new Private(hours, minutes, seconds)) {
@@ -82,23 +80,44 @@ namespace My {
         delete p;
     }
 
+    void Time::init(int minutes) {
+        if (this->p != NULL)
+            throw CustomException(__FILE__, __LINE__, CustomException::INVALID_INITIALIZATION);
+        p = new Private(0, minutes, 0);
+    }
+
+    void Time::init(int hours, int minutes, int seconds) {
+        if (this->p != NULL)
+            throw CustomException(__FILE__, __LINE__, CustomException::INVALID_INITIALIZATION);
+        p = new Private(hours, minutes, seconds);
+    }
+
+    void Time::validate(string file, int line) const {
+        if (this->p == nullptr)
+            throw CustomException(file, line, CustomException::UNINITIALIZED_OBJECT);
+    }
+
     int Time::getHours() const {
+        this->validate(__FILE__, __LINE__);
         return this->p->hours;
     }
 
     int Time::getMinutes() const {
+        this->validate(__FILE__, __LINE__);
         return this->p->minutes;
     }
 
     int Time::getSeconds() const {
+        this->validate(__FILE__, __LINE__);
         return this->p->seconds;
     }
     
-    std::string Time::getTime() const {
-        std::ostringstream ouptutStringStream;
+    string Time::getTime() const {
+        this->validate(__FILE__, __LINE__);
+        ostringstream ouptutStringStream;
         if (this->p->hours < 0 || this->p->minutes < 0 || this->p->seconds < 0)
             ouptutStringStream << '-';
-        int digitsCount = std::to_string(std::max(p->MINUTES_PER_HOUR, p->SECONDS_PER_MINUTE)).length();
+        int digitsCount = to_string(max(p->MINUTES_PER_HOUR, p->SECONDS_PER_MINUTE)).length();
         ouptutStringStream << getCountPositiveDigits(digitsCount, this->p->hours) << ':'
             << getCountPositiveDigits(digitsCount, this->p->minutes) << ':'
             << getCountPositiveDigits(digitsCount, this->p->seconds);
@@ -111,6 +130,7 @@ namespace My {
     }
 
     void Time::add(const Time &time) {
+        this->validate(__FILE__, __LINE__);
         this->p->hours += time.p->hours;
         this->p->minutes += time.p->minutes;
         this->p->seconds += time.p->seconds;
@@ -118,28 +138,32 @@ namespace My {
     }
 
     void Time::subtract(const Time &time) {
+        this->validate(__FILE__, __LINE__);
         this->p->hours -= time.p->hours;
         this->p->minutes -= time.p->minutes;
         this->p->seconds -= time.p->seconds;
         this->p->fixFormat();
     }
 
-    std::string Time::toString() const {
-        std::stringstream sstream;
+    string Time::toString() const {
+        this->validate(__FILE__, __LINE__);
+        stringstream sstream;
         sstream << "H: " << this->p->hours << ", M: " << this->p->minutes << ", S: " << this->p->seconds
             << ", ID: " << this->p->ID;
         return sstream.str();
     }
 
-    std::ostream& operator<<(std::ostream &outputStream, const Time &time) {
+    ostream& operator<<(ostream &outputStream, const Time &time) {
+        time.validate(__FILE__, __LINE__);
         outputStream << time.getTime();
         return outputStream;
     }
 
-    std::istream& operator>>(std::istream &inputStream, Time &time) {
+    istream& operator>>(istream &inputStream, Time &time) {
+        time.validate(__FILE__, __LINE__);
         char sep1, sep2;
-        Time tmp;
-        std::string input, currentValue;
+        Time tmp = Time(0);
+        string input, currentValue;
         bool isNegative = 0;
 
         getline(inputStream, input);
@@ -164,11 +188,14 @@ namespace My {
     }
 
     Time& Time::operator=(Time time) {
-        std::memcpy(this->p, time.p, sizeof(Private));
+        time.validate(__FILE__, __LINE__);
+        memcpy(this->p, time.p, sizeof(Private));
         return *this;
     }
 
     bool Time::operator==(const Time &time) const {
+        this->validate(__FILE__, __LINE__);
+        time.validate(__FILE__, __LINE__);
         if (this->p->hours == time.p->hours
                 && this->p->minutes == time.p->minutes
                 && this->p->seconds == time.p->seconds)
@@ -181,6 +208,8 @@ namespace My {
     }
 
     bool Time::operator<(const Time &time) const {
+        this->validate(__FILE__, __LINE__);
+        time.validate(__FILE__, __LINE__);
         if (this->p->hours < time.p->hours)
             return 1;
         if (this->p->hours == time.p->hours) {
@@ -206,12 +235,14 @@ namespace My {
     }
 
     Time Time::operator++() {
+        this->validate(__FILE__, __LINE__);
         ++this->p->minutes;
         this->p->fixFormat();
         return *this;
     }
 
     Time Time::operator++(int) {
+        this->validate(__FILE__, __LINE__);
         Time copy = *this;
         ++this->p->minutes;
         this->p->fixFormat();
@@ -219,12 +250,14 @@ namespace My {
     }
 
     Time Time::operator--() {
+        this->validate(__FILE__, __LINE__);
         --this->p->minutes;
         this->p->fixFormat();
         return *this;
     }
 
     Time Time::operator--(int) {
+        this->validate(__FILE__, __LINE__);
         Time copy = *this;
         --this->p->minutes;
         this->p->fixFormat();
@@ -236,10 +269,10 @@ namespace My {
     const unsigned int Time::Private::SECONDS_PER_MINUTE = 60;
     const char Time::Private::SEPERATOR = ':';
 
-    std::string getCountPositiveDigits(int count, int value) {
-        std::stringstream sstream;
+    string getCountPositiveDigits(int count, int value) {
+        stringstream sstream;
         int positiveValue = abs(value);
-        int nrOfDigits = std::to_string(positiveValue).length();
+        int nrOfDigits = to_string(positiveValue).length();
         while (nrOfDigits < count) {
             sstream << 0;
             --count;
@@ -248,16 +281,16 @@ namespace My {
         return sstream.str();
     }
 
-    int readUnit(std::string input, int &index, char seperator) {
-        std::string currentValue;
+    int readUnit(string input, int &index, char seperator) {
+        string currentValue;
         while (isdigit(input[index])) {
             currentValue += input[index];
             ++index;
         }
         if (input[index] == seperator || index == input.size()) {
-            return std::stoi(currentValue);
+            return stoi(currentValue);
         }
-        throw std::ios_base::failure(Error::Time::wrongInputFormat);
+        throw ios_base::failure(Error::WRONG_INPUT_FORMAT);
     }
 
 }
