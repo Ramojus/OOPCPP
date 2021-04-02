@@ -2,7 +2,7 @@
 #include <sstream>
 #include <cstring>
 #include "time.h"
-#include "customException.h"
+#include "locatedException.h"
 
 using namespace std;
 
@@ -25,7 +25,7 @@ namespace My {
         public:
             Private(int hours, int minutes, int seconds);
             ~Private();
-            void fixFormat();
+            void format();
 
         friend istream& operator>>(istream &inputStream, Time &time);
         friend Time;
@@ -41,13 +41,13 @@ namespace My {
         this->hours = hours;
         this->minutes = minutes;
         this->seconds = seconds;
-        this->fixFormat();
+        this->format();
     }
 
     Time::Private::~Private() {
     }
 
-    void Time::Private::fixFormat() {
+    void Time::Private::format() {
         if (this->seconds >= 0) {
             this->minutes += this->seconds / SECONDS_PER_MINUTE;
             this->seconds = this->seconds % SECONDS_PER_MINUTE;
@@ -96,19 +96,19 @@ namespace My {
 
     void Time::init(int minutes) {
         if (this->p != NULL)
-            throw CustomException(__FILE__, __LINE__, CustomException::INVALID_INITIALIZATION);
+            throw LocatedException(__FILE__, __LINE__, LocatedException::INVALID_INITIALIZATION);
         p = new Private(0, minutes, 0);
     }
 
     void Time::init(int hours, int minutes, int seconds) {
         if (this->p != NULL)
-            throw CustomException(__FILE__, __LINE__, CustomException::INVALID_INITIALIZATION);
+            throw LocatedException(__FILE__, __LINE__, LocatedException::INVALID_INITIALIZATION);
         p = new Private(hours, minutes, seconds);
     }
 
     void Time::validate(string file, int line) const {
         if (this->p == NULL)
-            throw CustomException(file, line, CustomException::UNINITIALIZED_OBJECT);
+            throw LocatedException(file, line, LocatedException::UNINITIALIZED_OBJECT);
     }
 
     int Time::getHours() const {
@@ -148,7 +148,7 @@ namespace My {
         this->p->hours += time.p->hours;
         this->p->minutes += time.p->minutes;
         this->p->seconds += time.p->seconds;
-        this->p->fixFormat();
+        this->p->format();
     }
 
     void Time::subtract(const Time &time) {
@@ -156,7 +156,7 @@ namespace My {
         this->p->hours -= time.p->hours;
         this->p->minutes -= time.p->minutes;
         this->p->seconds -= time.p->seconds;
-        this->p->fixFormat();
+        this->p->format();
     }
 
     string Time::toString() const {
@@ -173,10 +173,7 @@ namespace My {
         return outputStream;
     }
 
-    // reads input in (-)H:M:S format with strong exception safety guarantee
     istream& operator>>(istream &inputStream, Time &time) {
-        time.validate(__FILE__, __LINE__);
-        char sep1, sep2;
         Time tmp = Time(0);
         string input, currentValue;
         bool isNegative = 0;
@@ -197,14 +194,19 @@ namespace My {
             tmp.p->minutes = -tmp.p->minutes;
             tmp.p->seconds = -tmp.p->seconds;
         }
-        tmp.p->fixFormat();
+        tmp.p->format();
         time = tmp;
         return inputStream;
     }
 
     Time& Time::operator=(Time time) {
         time.validate(__FILE__, __LINE__);
-        memcpy(this->p, time.p, sizeof(Private));
+        if (*this == time)
+            return *this;
+        if (this->p != NULL)
+            delete this->p;
+
+        this->p = new Private(*time.p);
         return *this;
     }
 
@@ -252,7 +254,7 @@ namespace My {
     Time Time::operator++() {
         this->validate(__FILE__, __LINE__);
         ++this->p->minutes;
-        this->p->fixFormat();
+        this->p->format();
         return *this;
     }
 
@@ -260,14 +262,14 @@ namespace My {
         this->validate(__FILE__, __LINE__);
         Time copy = *this;
         ++this->p->minutes;
-        this->p->fixFormat();
+        this->p->format();
         return copy;
     }
 
     Time Time::operator--() {
         this->validate(__FILE__, __LINE__);
         --this->p->minutes;
-        this->p->fixFormat();
+        this->p->format();
         return *this;
     }
 
@@ -275,7 +277,7 @@ namespace My {
         this->validate(__FILE__, __LINE__);
         Time copy = *this;
         --this->p->minutes;
-        this->p->fixFormat();
+        this->p->format();
         return copy;
     }
 
@@ -297,7 +299,7 @@ namespace My {
             currentValue += input[index];
             ++index;
         }
-        if (input[index] == seperator || index == input.size()) {
+        if (input[index] == seperator || (unsigned int)index == input.size()) {
             return stoi(currentValue);
         }
         throw ios_base::failure(Error::WRONG_INPUT_FORMAT);

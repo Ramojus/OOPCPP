@@ -3,8 +3,8 @@
 #include <cassert>
 #include <sstream>
 
-#include "time.h"
-#include "customException.h"
+#include "src/time.h"
+#include "locatedException.h"
 
 using namespace std;
 using namespace My;
@@ -78,7 +78,7 @@ int main () {
 
         cout << "\nEverything seems to be working correctly" << endl;
     }
-    catch (const CustomException &e) {
+    catch (const LocatedException &e) {
         cout << e.what() << endl;
     }
     catch (const invalid_argument &e) {

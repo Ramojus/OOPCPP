@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-class CustomException {
+class LocatedException {
     private:
         std::string exception;
 
@@ -9,6 +9,6 @@ class CustomException {
         static const std::string UNINITIALIZED_OBJECT;
         static const std::string INVALID_INITIALIZATION;
 
-        CustomException(std::string file, int line, std::string msg);
+        LocatedException(std::string file, int line, std::string msg);
         std::string what() const;
 };
