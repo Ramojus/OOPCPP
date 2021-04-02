@@ -47,11 +47,15 @@ $(TEST).o: $(TEST).cpp $(TEST_HEADER_FILES)
 run_test:
 	$(TEST_RUN)
 
-test: build_test
-	$(TEST_RUN)
+test: build_test run_test
 
 doc:
 	$(DOC)
+
+deploy:
+	git add .
+	git commit
+	git push
 
 rebuild: clean all
 
@@ -63,4 +67,4 @@ clean:
 	rm -f $(TEST).o
 	rm -f $(TEST_OUTPUT)
 
-.PHONY: all clean rebuild build_test run_test doc
+.PHONY: all clean rebuild build_test run_test test doc deploy
