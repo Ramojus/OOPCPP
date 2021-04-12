@@ -36,7 +36,7 @@ namespace My {
 
             /**
              * Adds every unit value of parameter object to current object respective unit values.
-             * @param `Time` object to add. Cannot be NULL.
+             * @param `Time` object to add.
              */
             void add(const Time &time);
 
