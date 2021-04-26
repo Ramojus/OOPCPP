@@ -33,6 +33,9 @@ namespace My {
             int getSeconds() const;
             std::string getTime() const;
             int getID() const;
+            static unsigned int getLiveInstanceCount();
+
+            bool isSameObject(const Time &time) const;
 
             /**
              * Adds every unit value of parameter object to current object respective unit values.

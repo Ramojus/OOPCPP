@@ -21,9 +21,11 @@ namespace My {
             static const unsigned int SECONDS_PER_MINUTE;
             static const char SEPARATOR;
             static unsigned int instanceCount;
+            static unsigned int liveInstanceCount;
 
         public:
             Private(int hours, int minutes, int seconds);
+            Private(const Time::Private &p);
             ~Private();
             void format();
 
@@ -32,19 +34,25 @@ namespace My {
     };
 
     unsigned int Time::Private::instanceCount = 0;
+    unsigned int Time::Private::liveInstanceCount = 0;
     const unsigned int Time::Private::MINUTES_PER_HOUR = 60;
     const unsigned int Time::Private::SECONDS_PER_MINUTE = 60;
     const char Time::Private::SEPARATOR = ':';
 
     Time::Private::Private(int hours, int minutes, int seconds) : ID(instanceCount) {
         ++this->instanceCount;
+        ++this->liveInstanceCount;
         this->hours = hours;
         this->minutes = minutes;
         this->seconds = seconds;
         this->format();
     }
 
+    Time::Private::Private(const Time::Private &p) : Private(p.hours, p.minutes, p.seconds) {
+    }
+
     Time::Private::~Private() {
+        --this->liveInstanceCount;
     }
 
     void Time::Private::format() {
@@ -81,7 +89,11 @@ namespace My {
     Time::Time() : p(NULL) {
     }
 
-    Time::Time(const Time &time) : p(new Private(*time.p)) {
+    Time::Time(const Time &time) {
+        if (time.p == NULL)
+            this->p = NULL;
+        else
+            this->p = new Private(*time.p);
     }
 
     Time::Time(int minutes) : p(new Private(0, minutes, 0)) {
@@ -95,9 +107,7 @@ namespace My {
     }
 
     void Time::init(int minutes) {
-        if (this->p != NULL)
-            throw LocatedException(__FILE__, __LINE__, LocatedException::INVALID_INITIALIZATION);
-        p = new Private(0, minutes, 0);
+        this->init(0, minutes, 0);
     }
 
     void Time::init(int hours, int minutes, int seconds) {
@@ -131,6 +141,7 @@ namespace My {
         ostringstream ouptutStringStream;
         if (this->p->hours < 0 || this->p->minutes < 0 || this->p->seconds < 0)
             ouptutStringStream << '-';
+
         int digitsCount = to_string(max(p->MINUTES_PER_HOUR, p->SECONDS_PER_MINUTE)).length();
         ouptutStringStream << getCountPositiveDigits(digitsCount, this->p->hours) << ':'
             << getCountPositiveDigits(digitsCount, this->p->minutes) << ':'
@@ -141,6 +152,14 @@ namespace My {
 
     int Time::getID() const {
         return this->p->ID;
+    }
+
+    unsigned int Time::getLiveInstanceCount() {
+        return Time::Private::liveInstanceCount;
+    }
+
+    bool Time::isSameObject(const Time &time) const {
+        return this->p == time.p;
     }
 
     void Time::add(const Time &time) {
@@ -174,7 +193,7 @@ namespace My {
     }
 
     istream& operator>>(istream &inputStream, Time &time) {
-        Time tmp = Time(0);
+        Time tmp(0);
         string input, currentValue;
         bool isNegative = 0;
 
@@ -304,6 +323,5 @@ namespace My {
         }
         throw ios_base::failure(Error::WRONG_INPUT_FORMAT);
     }
-
 }
 

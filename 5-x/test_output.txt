@@ -1,0 +1,5 @@
+[0;36m[doctest] [0mrun with "--help" for options
+[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0;33m===============================================================================
+[0;36m[doctest] [0mtest cases: 12 | [0;32m12 passed[0m | [0m0 failed[0m | [0m0 skipped[0m
+[0;36m[doctest] [0massertions: 56 | [0;32m56 passed[0m | [0m0 failed[0m |
+[0;36m[doctest] [0mStatus: [0;32mSUCCESS![0m
