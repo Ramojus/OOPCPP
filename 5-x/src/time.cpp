@@ -263,7 +263,7 @@ namespace My {
     }
 
     bool Time::operator>(const Time &time) const {
-        return !(*this < time);
+        return !(*this <= time);
     }
 
     bool Time::operator>=(const Time &time) const {

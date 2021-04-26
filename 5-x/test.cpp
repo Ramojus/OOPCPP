@@ -31,24 +31,41 @@ TEST_CASE("Comparison operators") {
     CHECK(Time(40, 30, 10) != Time(40, 30, 11));
     CHECK(Time(40, 30, 10) != Time(40, 31, 10));
     CHECK(Time(40, 30, 10) != Time(41, 30, 10));
+    CHECK_FALSE(Time(40, 30, 10) == Time(40, 30, 11));
+    CHECK_FALSE(Time(40, 30, 10) == Time(40, 31, 10));
+    CHECK_FALSE(Time(40, 30, 10) == Time(41, 30, 10));
 
     CHECK(Time(40, 30, 11) > Time(40, 30, 10));
     CHECK(Time(40, 31, 10) > Time(40, 30, 10));
     CHECK(Time(41, 30, 10) > Time(40, 30, 10));
+    CHECK_FALSE(Time(40, 30, 11) <= Time(40, 30, 10));
+    CHECK_FALSE(Time(40, 31, 10) <= Time(40, 30, 10));
+    CHECK_FALSE(Time(41, 30, 10) <= Time(40, 30, 10));
 
     CHECK(Time(40, 30, 11) >= Time(40, 30, 10));
     CHECK(Time(40, 31, 10) >= Time(40, 30, 10));
     CHECK(Time(41, 30, 10) >= Time(40, 30, 10));
     CHECK(Time(40, 30, 10) >= Time(40, 30, 10));
+    CHECK_FALSE(Time(40, 30, 11) < Time(40, 30, 10));
+    CHECK_FALSE(Time(40, 31, 10) < Time(40, 30, 10));
+    CHECK_FALSE(Time(41, 30, 10) < Time(40, 30, 10));
+    CHECK_FALSE(Time(40, 30, 10) < Time(40, 30, 10));
 
     CHECK(Time(40, 30, 10) < Time(40, 30, 11));
     CHECK(Time(40, 30, 10) < Time(40, 31, 10));
     CHECK(Time(40, 30, 10) < Time(41, 30, 10));
+    CHECK_FALSE(Time(40, 30, 10) >= Time(40, 30, 11));
+    CHECK_FALSE(Time(40, 30, 10) >= Time(40, 31, 10));
+    CHECK_FALSE(Time(40, 30, 10) >= Time(41, 30, 10));
 
     CHECK(Time(40, 30, 10) <= Time(40, 30, 11));
     CHECK(Time(40, 30, 10) <= Time(40, 31, 10));
     CHECK(Time(40, 30, 10) <= Time(41, 30, 10));
     CHECK(Time(40, 30, 10) <= Time(40, 30, 10));
+    CHECK_FALSE(Time(40, 30, 10) > Time(40, 30, 11));
+    CHECK_FALSE(Time(40, 30, 10) > Time(40, 31, 10));
+    CHECK_FALSE(Time(40, 30, 10) > Time(41, 30, 10));
+    CHECK_FALSE(Time(40, 30, 10) > Time(40, 30, 10));
 }
 
 TEST_CASE("Input/output stream operators") {
