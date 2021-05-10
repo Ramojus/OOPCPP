@@ -2,7 +2,7 @@ CC = g++
 CFLAGS = -Wall
 INCLUDES = -I$(LIB_DIR)
 
-TARGET = fileMonitor
+TARGET = fileTime
 
 SOURCE_DIR = src
 LIB_DIR = lib
