@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstring>
 
-#include "fileTimeMonitor.h"
+#include "fileTimeManager.h"
 
 using namespace std;
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
         setArguments(argc, argv, fileName, shouldDeleteSavedVersions);
         string fullDirectory = getFullPath(fileName);
         File file(fileName, fullDirectory);
-        FileTimeMonitor fileTimeMonitor;
+        FileTimeManager fileTimeMonitor;
         fileTimeMonitor.monitor(file, shouldDeleteSavedVersions);
     }
     catch(exception &e) {

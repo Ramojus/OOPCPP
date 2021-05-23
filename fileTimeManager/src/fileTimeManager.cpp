@@ -1,10 +1,10 @@
-#include "fileTimeMonitor.h"
+#include "fileTimeManager.h"
 #include "input.h"
 #include "action.h"
 
 void inputLoop();
 
-void FileTimeMonitor::monitor(File file, bool shouldDeleteSavedVersions) {
+void FileTimeManager::monitor(File file, bool shouldDeleteSavedVersions) {
     // TODO: Start monitoring with a separate thread.
     Monitor monitor(file);
     monitor.start();

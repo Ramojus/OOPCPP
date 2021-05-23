@@ -3,7 +3,7 @@
 
 #include "monitor.h"
 
-class FileTimeMonitor {
+class FileTimeManager {
     public:
         void monitor(File file, bool shouldDeleteSavedVersions);
 };
